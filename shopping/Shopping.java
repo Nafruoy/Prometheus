@@ -129,7 +129,11 @@ public class Shopping {
 		System.out.println();
 		for(int index = 0; index < weaponsStock.length; index++){
 			//if (person.getLevel() >= stock[index].requiredLevel)  In case we want to not show unavailable items
-			System.out.println("("+ index +") "+  stock[index].getPrice() + " - "+ stock[index].getName() + " - " + "You must be Level " + stock[index].getRequiredLevel() + " to purchase.");
+			System.out.print("("+ index +") "+  stock[index].getPrice() + " - "+ stock[index].getName());
+			if (person.getLevel() < stock[index].requiredLevel)
+				System.out.println(" - " + "You must be Level " + stock[index].getRequiredLevel() + " to purchase.");
+			else
+				System.out.println();
 		}
 		System.out.println("(9) Back to Store Menu");
 	}
