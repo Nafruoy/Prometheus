@@ -5,8 +5,9 @@ import java.util.Scanner;
 
 public class Shopping {
 
-	private shopWeaponItem[] weaponsStock = {new shopWeaponItem("Sword Weapon", 350, "weapon", 1), new shopWeaponItem("Knife Weapon", 50, "weapon", 2), new shopWeaponItem("Dagger Weapon", 125, "weapon", 3), new shopWeaponItem("Mace Weapon", 350, "weapon", 5)}; 
-	private shopWeaponItem[] itemsStock = {new shopWeaponItem("Health Potion", 150, "item", 1), new shopWeaponItem("Mana Potion", 150, "item", 2), new shopWeaponItem("Antidote", 100, "item", 3), new shopWeaponItem("Energy Restore", 225, "item", 4), new shopWeaponItem("Burn Heal", 250, "item", 5)};	
+	private shopWeaponItem[] weaponsStock = {new shopWeaponItem("Sword Weapon", 350, "Weapon", 1, 1), new shopWeaponItem("Knife Weapon", 50, "Weapon", 2, 2), new shopWeaponItem("Dagger Weapon", 125, "Weapon", 3, 3), new shopWeaponItem("Mace Weapon", 350, "Weapon", 4, 4)}; 
+	private shopWeaponItem[] itemsStock = {new shopWeaponItem("Health Potion", 150, "Item", 1, 1), new shopWeaponItem("Mana Potion", 150, "Item", 2, 2), new shopWeaponItem("Antidote", 100, "Item", 3, 3), new shopWeaponItem("Energy Restore", 225, "Item", 4, 4), new shopWeaponItem("Burn Heal", 250, "Item", 5, 5)};	
+	private shopWeaponItem[] armorStock = {new shopWeaponItem("Dirty Rags", 100, "Armor", 1, 0), new shopWeaponItem("Layered Silk", 100, "Armor", 2,10), new shopWeaponItem("Plate Armor", 100, "Armor", 3, 20)};
 	
 	static Scanner input = new Scanner(System.in);
 	private String response = null;
@@ -30,16 +31,18 @@ public class Shopping {
 		
 		currentlyHere = true;
 		while (currentlyHere == true){
-			System.out.println("Weapons (1) / Consumables (2) / View Backpack(3) /Exit Store (4)");
+			System.out.println("Weapons (1) / Consumables (2) / Armor (3) / View Backpack (4) /Exit Store (9)");
 			response = input.nextLine();
 			
 			if (response.equals("1"))
-				browseWeapons(person);
+				browse(weaponsStock,person);
 			else if (response.equals("2"))
-				browseItems(person);
+				browse(itemsStock,person);
 			else if (response.equals("3"))
-				person.backpack.viewInventory();
+				browse(armorStock, person);
 			else if (response.equals("4"))
+				person.backpack.viewInventory();
+			else if (response.equals("9"))
 				exitStore();
 			else
 				System.out.println("Invalid input.");
@@ -60,7 +63,7 @@ public class Shopping {
 	/*
 	 * Browse
 	 */
-	
+	/*
 	//Displays weapons then switch statement to handle player choices
 	public void browseWeapons(Character_Class person) throws Exception{
 		System.out.println("Weapons:"); // (Number to Type) [Price] - [Weapons]
@@ -120,6 +123,42 @@ public class Shopping {
 		}
 		
 	}
+	*/
+	//Trying to create general browse method. Using if else statements instead. Much more dynamic in terms of things to compare with.
+	//basic browse guide
+	
+	/*While browsing is true
+	 * 		display items
+	 * 		ask for response (implicitly)
+	 * 		convert response to int
+	 * 		if answer is in range of index with passed array, buy item
+	 * 		else if answer is 9, exit, or back, back up one level
+	 * 		else, invalid answer
+	 */
+	
+	
+	
+	public void browse(shopWeaponItem[] stock, Character_Class person) throws Exception {
+		System.out.println(stock[0].getType() + " :"); //using the first element of the array to grab the type of items the player is browsing.
+		browsing = true;
+		
+		while (browsing == true) {
+			displayStock(stock, person);
+			response = input.nextLine();
+			int responseInt = Integer.parseInt(response); //using as array index
+			
+			if (responseInt >= 0 && responseInt <= stock.length) //if index is in range; purchase item
+				buyItem(person, stock[responseInt].getName(), stock[responseInt].getPrice(), stock[responseInt].getRequiredLevel());
+			else if (responseInt == 9 || response.toString() == "back" || response.toString() == "exit")// Leave browsing menu
+				browsing = false;
+			else if (responseInt < 1 || responseInt > stock.length +1) //response outside of array range
+				System.out.println("Don't have anything on that shelf yet. Anything else?");
+			else
+				System.out.println("Invalid input");
+		}
+	}
+	
+	
 	
 	/*
 	 * Display Stock
@@ -127,10 +166,11 @@ public class Shopping {
 	
 	public void displayStock(shopWeaponItem[] stock, Character_Class person) throws Exception{ //used for weapons and items
 		System.out.println();
-		for(int index = 0; index < weaponsStock.length; index++){
+		for(int index = 0; index < stock.length; index++){
 			//if (person.getLevel() >= stock[index].requiredLevel)  In case we want to not show unavailable items
 			System.out.print("("+ index +") "+  stock[index].getPrice() + " - "+ stock[index].getName());
-			if (person.getLevel() < stock[index].requiredLevel)
+			
+			if (person.getLevel() < stock[index].requiredLevel) // if player hasn't reached required level, display level requirement 
 				System.out.println(" - " + "You must be Level " + stock[index].getRequiredLevel() + " to purchase.");
 			else
 				System.out.println();
@@ -141,7 +181,7 @@ public class Shopping {
 	/*
 	 * Buy Item
 	 */
-	public void buyItem(Character_Class person, String item, int price, int requiredLevel) throws Exception{ //change String item to shopstock or whatever when I figure out how to implement.
+	public void buyItem(Character_Class person, String item, int price, int requiredLevel) throws Exception{ 
 		if(person.getMoney() >= price && person.getLevel() >= requiredLevel){
 			person.setMoney(person.getMoney() - price);
 			person.backpack.addToInventory(item, 1);//add item to inventory
@@ -178,23 +218,25 @@ public class Shopping {
 	}
 	
 	/*
-	 * JUNK CLASS FOR JUNK OBJECTS FOR JUNK INFORMATION  <-- DELETE AS SOON REAL WEAPONS AND ITEMS ARE MADE
+	 * JUNK CLASS FOR JUNK OBJECTS FOR JUNK INFORMATION  <-- DELETE AS SOON REAL WEAPONS, ITEMS, AND ARMOR ARE MADE
 	 */
 	class shopWeaponItem {
 		private String name; //name
 		private int price;   //gold price
 		private String type; //item or weapon
 		private int requiredLevel; //required level to purchase weapon
+		private int specialStat;
 		
 		shopWeaponItem(){
 		}
 		
 		//Constructor - 4 accepted arguments
-		shopWeaponItem(String name, int price, String type, int requiredLevel){
+		shopWeaponItem(String name, int price, String type, int requiredLevel, int specialStat){
 			this.name = name;
 			this.price = price;
 			this.type = type;
 			this.requiredLevel = requiredLevel;
+			this.specialStat = specialStat; //special stat is the amount armor adds to player's armor stat, or how much a basic health potion.
 		}
 		
 		public String getName(){
@@ -212,7 +254,9 @@ public class Shopping {
 		public int getRequiredLevel() {
 			return this.requiredLevel;
 		}
-	
 		
+		public int getSpecialStat() {
+			return this.specialStat;
+		}
 	}
 }
