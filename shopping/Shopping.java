@@ -67,7 +67,7 @@ public class Shopping {
 		browsing = true;
 			
 		while (browsing == true){    //using placeholder strings for parameters
-			displayStock(weaponsStock);
+			displayStock(weaponsStock, person);
 			response = input.nextLine();
 			switch (response.toString()){
 			
@@ -98,7 +98,7 @@ public class Shopping {
 		browsing = true;
 		
 		while (browsing == true){   //using placeholder strings for parameters
-			displayStock(itemsStock);
+			displayStock(itemsStock, person);
 			response = input.nextLine();
 			switch (response.toString()){
 				case "0":	buyItem(person, itemsStock[0].getName(), itemsStock[0].getPrice(), itemsStock[0].getRequiredLevel()); //"Health Potion"
@@ -125,9 +125,10 @@ public class Shopping {
 	 * Display Stock
 	 */
 	
-	public void displayStock(shopWeaponItem[] stock){
+	public void displayStock(shopWeaponItem[] stock, Character_Class person) throws Exception{ //used for weapons and items
 		System.out.println();
 		for(int index = 0; index < weaponsStock.length; index++){
+			//if (person.getLevel() >= stock[index].requiredLevel)  In case we want to not show unavailable items
 			System.out.println("("+ index +") "+  stock[index].getPrice() + " - "+ stock[index].getName() + " - " + "You must be Level " + stock[index].getRequiredLevel() + " to purchase.");
 		}
 		System.out.println("(9) Back to Store Menu");
